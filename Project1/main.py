@@ -129,16 +129,20 @@ def aStarSearch(start,end):
 def main():
     start,end=read("Input4.txt")
     goalNode,nodeCount=aStarSearch(start,end)
+    #print the number of nodes created by this method
     print(nodeCount)
     helper=goalNode
     outAction=""
     outFValue=""
+    #print the path cost of the goal node(aka the total steps to solve the puzzle)
     print(goalNode.pc)
     while helper is not None:
         outAction=helper.action+" "+outAction
         outFValue=str(helper.eval)+" "+outFValue
+        #print each step to be taken, the sequence is reversed, aka it shows the state of the board from end to beginning
         print(helper.grid)
         helper=helper.prev
+    #print the actions taken and the f(n) value of each step
     print(outAction)
     print(outFValue)
 
