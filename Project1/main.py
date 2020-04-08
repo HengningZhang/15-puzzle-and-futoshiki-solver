@@ -91,43 +91,47 @@ def aStarSearch(start,end):
         #if it is the goal node, return it and the nodecount
         if cur.grid==end:
             return cur,nodecount
-        #if it is explored, ignore it and go to the next node
-        #if not, adds it to the explored list and proceed
-        if cur.grid in explored:
-            continue
-        else:
-            explored.append(cur.grid)
+        #adds it to the explored list and proceed, as we check for repeating while generating nodes, there would be no duplicates
+        explored.append(cur.grid)
         #read the posision of the blank space of the current state
         curI,curJ=cur.spacePosition
         #if there is place for the blank space to move up, move it up and store the result node into the priority queue
+        #adds the node to the frontier if it is not a repeated state
         if curI>0:
             up=copy.deepcopy(cur.grid)
             up[curI][curJ],up[curI-1][curJ]=up[curI-1][curJ],up[curI][curJ]
-            heapq.heappush(frontier,Node(up,manhattanDistance(up,end),cur.pc+1,"U",cur))
-            nodecount+=1
+            if up not in explored:
+                heapq.heappush(frontier,Node(up,manhattanDistance(up,end),cur.pc+1,"U",cur))
+                nodecount+=1
         #if there is place for the blank space to move down, move it down and store the result node into the priority queue
+        #adds the node to the frontier if it is not a repeated state
         if curI<3:
             down=copy.deepcopy(cur.grid)
             down[curI][curJ],down[curI+1][curJ]=down[curI+1][curJ],down[curI][curJ]
-            heapq.heappush(frontier,Node(down,manhattanDistance(down,end),cur.pc+1,"D",cur))
-            nodecount+=1
+            if down not in explored:
+                heapq.heappush(frontier,Node(down,manhattanDistance(down,end),cur.pc+1,"D",cur))
+                nodecount+=1
         #if there is place for the blank space to move left, move it left and store the result node into the priority queue
+        #adds the node to the frontier if it is not a repeated state
         if curJ>0:
             left=copy.deepcopy(cur.grid)
             left[curI][curJ],left[curI][curJ-1]=left[curI][curJ-1],left[curI][curJ]
-            heapq.heappush(frontier,Node(left,manhattanDistance(left,end),cur.pc+1,"L",cur))
-            nodecount+=1
+            if left not in explored:
+                heapq.heappush(frontier,Node(left,manhattanDistance(left,end),cur.pc+1,"L",cur))
+                nodecount+=1
         #if there is place for the blank space to move right, move it right and store the result node into the priority queue
+        #adds the node to the frontier if it is not a repeated state
         if curJ<3:
             right=copy.deepcopy(cur.grid)
             right[curI][curJ],right[curI][curJ+1]=right[curI][curJ+1],right[curI][curJ]
-            heapq.heappush(frontier,Node(right,manhattanDistance(right,end),cur.pc+1,"R",cur))
-            nodecount+=1
+            if right not in explored:
+                heapq.heappush(frontier,Node(right,manhattanDistance(right,end),cur.pc+1,"R",cur))
+                nodecount+=1
 
 #this runs the code above and print the needed stats
 #to run the code on different input files just change the names of the file
 def main():
-    start,end=read("Input4.txt")
+    start,end=read("Input1.txt")
     goalNode,nodeCount=aStarSearch(start,end)
     #print the number of nodes created by this method
     print(nodeCount)
