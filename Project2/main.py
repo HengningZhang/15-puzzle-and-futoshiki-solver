@@ -1,6 +1,7 @@
 import heapq
 import copy
 
+#read the input files
 def read(filename):
     f=open(filename,"r")
     start=[]
@@ -18,7 +19,13 @@ def read(filename):
         upDown.append(f.readline().split(" "))
     return start,leftRight,upDown
 
-
+#define the node object to be used later
+#it takes the game board and the constraints as input
+#use the generateDomains function to turn the board into a scratch domains matrix just using the rule that no duplicate number would be in each row and each line
+#use inequality as the heuristics for forward checking and further narrow the domains
+#the most constrained variable's position and the number of variables it constraints are calculated by the mostConstrainVariable function
+#the domain size of the most constrained variable is calculated by its length
+#the domain size of the most constrained variable is also used to form a priority queue, which would be used later to decide the best way to assign a value to a variable
 class node:
     def __init__(self,board,leftRightConstraints,upDownConstraints):
         self.board=board
@@ -38,6 +45,7 @@ class node:
     def __eq__(self,other):
         return self.lenMCDV==other.lenMCDV and self.constrainingNum==other.constrainingNum
 
+#checks if all the variables has values assigned to them
 def checkFilled(board):
     for i in range(5):
         for j in range(5):
@@ -45,6 +53,9 @@ def checkFilled(board):
                 return False
     else:
         return True
+
+#generate the scratch domains for the variables in the board
+#using just the simple rule of no duplicate value in each row and each line
 def generateDomains(board):
     domains=[[] for i in range(5)]
     for i in range(5):
@@ -61,9 +72,17 @@ def generateDomains(board):
                 domains[i].append([board[i][j]])
     return domains
 
+#the main algorithm in this solution
+#use the inequalities to further constrain the domains
+#bigger than means that the smaller variable can only have the values that are less than the bigger variable's max possible value
+#checks if there is any variable ended up with no value available to them in each step, return False and end if there is an empty domain
 def forwardChecking(domains,leftRightConstraints,upDownConstraints):
-    valid=True
     for n in range(5):
+        for i in range(5):
+            for j in range(5):
+                if not domains[i][j]:
+                    return False
+
         for i in range(5):
             for j in range(4):
                 if leftRightConstraints[i][j][0]==">":
@@ -74,6 +93,11 @@ def forwardChecking(domains,leftRightConstraints,upDownConstraints):
                     for k in range(max(domains[i][j+1]),6):
                         if k in domains[i][j]:
                             domains[i][j].remove(k)
+        for i in range(5):
+            for j in range(5):
+                if not domains[i][j]:
+                    return False
+                    
         for i in range(4):
             for j in range(5):
                 if upDownConstraints[i][j][0]=="v":
@@ -84,11 +108,10 @@ def forwardChecking(domains,leftRightConstraints,upDownConstraints):
                     for k in range(max(domains[i+1][j]),6):
                         if k in domains[i][j]:
                             domains[i][j].remove(k)
-    for i in range(5):
-        for j in range(5):
-            if not domains[i][j]:
-                valid=False
-    return valid 
+    return True
+
+#gets the most constrained variable by checking whether the position is still 0 in the board and whether a variable has the smallest domain
+#gets the most constrained variable's constrainingNum(how many variable it constraints) by checking how many variables in its same row and column have not been assigned value
 def mostConstrainVariable(board,domains):
     minCount=5
     maxCount=0
@@ -114,7 +137,12 @@ def mostConstrainVariable(board,domains):
                         maxCount=counter
     return mcdv,constrainingNum
 
-
+#create a priority queue with the initial board and the constraints
+#assign a value to the most constrained variable and push the new nodes created by this operation into the priority queue if the new node is valid(satisfies the constraints)
+#pick the node with the most constrained variable, assign a value to it and do the same thing again
+#if two nodes both have the most constrained variable, break the tie by checking how many other variables they each constraints
+#do all the things above again and again until every place in the block has been filled
+#the all-filled board would be the solution
 def backTrack(anode):
     frontier=[]
     frontier.append(anode)
@@ -134,16 +162,16 @@ def backTrack(anode):
     return False
 
 
-data=read("input1.txt")
-for elem in generateDomains(data[0]):
-    print(elem)
-for elem in data[1]:
-    print(elem)
-for elem in data[2]:
-    print(elem)
+data=read("Input3.txt")
+# for elem in generateDomains(data[0]):
+#     print(elem)
+# for elem in data[1]:
+#     print(elem)
+# for elem in data[2]:
+#     print(elem)
 anode=node(data[0],data[1],data[2])
-for elem in anode.domains:
-    print(elem)
+# for elem in anode.domains:
+#     print(elem)
 
 
 print(backTrack(anode))
