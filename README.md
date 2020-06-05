@@ -1,5 +1,4 @@
-# CS_4613_Projects
-Projects for CS 4613 Intro to AI
+15 puzzle and futoshki solver
 
 Project 1 is a solver for 15 Puzzle using A* algorithm.
 
